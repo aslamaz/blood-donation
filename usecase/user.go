@@ -27,8 +27,8 @@ func GenerateToken(req *request.LoginRequest) (*response.LoginResponse, error) {
 		"id":  u.Id,
 		"exp": time.Now().Add(30 * time.Minute).Unix(),
 	})
-	hmacSampleSecret := []byte("my_secret_key")
-	// Sign and get the complete encoded token as a string using the secret
+	hmacSampleSecret := []byte(constant.JwtSigningKey)
+	// Sign and get the complete encoded token as a string using the secret9
 	tokenString, err := token.SignedString(hmacSampleSecret)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate token: %w", err)
