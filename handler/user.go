@@ -39,7 +39,7 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendJson(w, http.StatusUnauthorized, &response.Response{Data: resp})
+	sendJson(w, http.StatusOK, &response.Response{Data: resp})
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -92,4 +92,52 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
+}
+
+func HandleUser(w http.ResponseWriter, r *http.Request) {
+	var req request.RegisterUser
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		sendJson(w, http.StatusBadRequest, &response.Response{
+			Error: err.Error(),
+		})
+		return
+	}
+	existingUser, err := repository.GetUserByEmail(req.Email)
+	if err != nil {
+		sendJson(w, http.StatusInternalServerError, &response.Response{
+			Error: "internal server errorr",
+		})
+		return
+	}
+	if existingUser != nil {
+		sendJson(w, http.StatusConflict, &response.Response{
+			Error: "email already exist",
+		})
+		return
+
+	}
+	existingUser, err = repository.GetUserByMobile(req.Mobile)
+	if err != nil {
+		sendJson(w, http.StatusInternalServerError, &response.Response{
+			Error: "internal server errorr",
+		})
+		return
+	}
+	if existingUser != nil {
+		sendJson(w, http.StatusConflict, &response.Response{
+			Error: "mobile already exist",
+		})
+
+		return
+	}
+
+	if !constant.IsValidBloodGroup(req.Bloodgroup) {
+		sendJson(w, http.StatusBadRequest, &response.Response{
+			Error: "invalid bloodgroup",
+		})
+		return
+	}
+
+	sendJson(w, http.StatusOK, &response.Response{Data: req})
 }
