@@ -17,7 +17,8 @@ func main() {
 
 	r.Get("/ping", handler.HandlePing)
 	r.Post("/login", handler.HandleLogin)
-
+	r.Get("/user/me", handler.GetUser)
+	r.Post("/user", handler.RegisterUser)
 	db, err := sql.Open("mysql", "root:root@/blood_donation?parseTime=true")
 	if err != nil {
 		panic(err)
