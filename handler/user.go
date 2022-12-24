@@ -94,7 +94,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func HandleUser(w http.ResponseWriter, r *http.Request) {
+func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var req request.RegisterUser
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -103,41 +103,35 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	existingUser, err := repository.GetUserByEmail(req.Email)
+	resp, err := usecase.RegisterUser(&req)
+
 	if err != nil {
-		sendJson(w, http.StatusInternalServerError, &response.Response{
-			Error: "internal server errorr",
-		})
-		return
-	}
-	if existingUser != nil {
-		sendJson(w, http.StatusConflict, &response.Response{
-			Error: "email already exist",
-		})
-		return
+		switch err {
 
-	}
-	existingUser, err = repository.GetUserByMobile(req.Mobile)
-	if err != nil {
-		sendJson(w, http.StatusInternalServerError, &response.Response{
-			Error: "internal server errorr",
-		})
+		case constant.ErrDuplicateEmail:
+			sendJson(w, http.StatusConflict, &response.Response{
+				Error: "email already exist",
+			})
+
+		case constant.ErrDuplicateMobile:
+			sendJson(w, http.StatusConflict, &response.Response{
+				Error: "mobile already exist",
+			})
+
+		case constant.ErrInvalidBloodGroup:
+			sendJson(w, http.StatusBadRequest, &response.Response{
+				Error: "invalid bloodgroup",
+			})
+
+		default:
+			fmt.Println(err)
+			sendJson(w, http.StatusInternalServerError, &response.Response{
+				Error: "internal server errorr",
+			})
+
+		}
 		return
 	}
-	if existingUser != nil {
-		sendJson(w, http.StatusConflict, &response.Response{
-			Error: "mobile already exist",
-		})
+	sendJson(w, http.StatusOK, &response.Response{Data: resp})
 
-		return
-	}
-
-	if !constant.IsValidBloodGroup(req.Bloodgroup) {
-		sendJson(w, http.StatusBadRequest, &response.Response{
-			Error: "invalid bloodgroup",
-		})
-		return
-	}
-
-	sendJson(w, http.StatusOK, &response.Response{Data: req})
 }
