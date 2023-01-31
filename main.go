@@ -12,13 +12,7 @@ import (
 )
 
 func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
 
-	r.Get("/ping", handler.HandlePing)
-	r.Post("/login", handler.HandleLogin)
-	r.Get("/user/me", handler.GetUser)
-	r.Post("/user", handler.RegisterUser)
 	db, err := sql.Open("mysql", "root:root@/blood_donation?parseTime=true")
 	if err != nil {
 		panic(err)
@@ -30,6 +24,14 @@ func main() {
 	}
 
 	repository.Db = db
+
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+
+	r.Get("/ping", handler.HandlePing)
+	r.Post("/login", handler.HandleLogin)
+	r.Get("/user/me", handler.GetUser)
+	r.Post("/user", handler.RegisterUser)
 
 	err = http.ListenAndServe(":3000", r)
 	if err != nil {

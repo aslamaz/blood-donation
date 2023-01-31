@@ -57,17 +57,23 @@ func RegisterUser(req *request.RegisterUser) (*response.RegisterUser, error) {
 	if existingUser != nil {
 		return nil, constant.ErrDuplicateMobile
 	}
+	bloodGroup, err := repository.GetBloodGroupById(req.BloodGroupId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bloodgroup by id: %w", err)
+	}
 
-	if !constant.IsValidBloodGroup(req.Bloodgroup) {
+	if bloodGroup == nil {
 		return nil, constant.ErrInvalidBloodGroup
 	}
+
 	var user model.User
 	user.Name = req.Name
 	user.Email = req.Email
-	user.BloodGroup = req.Bloodgroup
+	user.BloodGroupId = req.BloodGroupId
 	user.Address = req.Address
 	user.Password = req.Password
 	user.Mobile = req.Mobile
+
 	id, err := repository.InsertUser(user)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert user:%w", err)

@@ -11,7 +11,7 @@ var Db *sql.DB
 
 // getUserByEmail
 func GetUserByEmail(email string) (*model.User, error) {
-	query := `SELECT id, email, password, address, blood_group, mobile, created_at, updated_at, deleted_at
+	query := `SELECT id, email, password, address, blood_group_id, mobile, created_at, updated_at, deleted_at
 	FROM user WHERE email=?`
 
 	var u model.User
@@ -20,7 +20,7 @@ func GetUserByEmail(email string) (*model.User, error) {
 		&u.Email,
 		&u.Password,
 		&u.Address,
-		&u.BloodGroup,
+		&u.BloodGroupId,
 		&u.Mobile,
 		&u.CreatedAt,
 		&u.UpdatedAt,
@@ -34,7 +34,7 @@ func GetUserByEmail(email string) (*model.User, error) {
 	return &u, nil
 }
 func GetUserByMobile(mobile string) (*model.User, error) {
-	query := `SELECT id, email, password, address, blood_group, mobile, created_at, updated_at, deleted_at
+	query := `SELECT id, email, password, address, blood_group_id, mobile, created_at, updated_at, deleted_at
 	FROM user WHERE mobile=?`
 
 	var u model.User
@@ -43,7 +43,7 @@ func GetUserByMobile(mobile string) (*model.User, error) {
 		&u.Email,
 		&u.Password,
 		&u.Address,
-		&u.BloodGroup,
+		&u.BloodGroupId,
 		&u.Mobile,
 		&u.CreatedAt,
 		&u.UpdatedAt,
@@ -58,7 +58,7 @@ func GetUserByMobile(mobile string) (*model.User, error) {
 }
 
 func GetUserById(id int) (*model.User, error) {
-	query := `SELECT id,name, email, password, address, blood_group, mobile, created_at, updated_at, deleted_at
+	query := `SELECT id,name, email, password, address, blood_group_id, mobile, created_at, updated_at, deleted_at
 	FROM user WHERE id=?`
 
 	var u model.User
@@ -68,7 +68,7 @@ func GetUserById(id int) (*model.User, error) {
 		&u.Email,
 		&u.Password,
 		&u.Address,
-		&u.BloodGroup,
+		&u.BloodGroupId,
 		&u.Mobile,
 		&u.CreatedAt,
 		&u.UpdatedAt,
@@ -83,8 +83,8 @@ func GetUserById(id int) (*model.User, error) {
 }
 func InsertUser(user model.User) (int, error) {
 
-	query := `INSERT INTO user (name,email,password,address,blood_group,mobile) VALUES (?,?,?,?,?,?)`
-	res, err := Db.Exec(query, user.Name, user.Email, user.Password, user.Address, user.BloodGroup, user.Mobile)
+	query := `INSERT INTO user (name,email,password,address,blood_group_id,mobile) VALUES (?,?,?,?,?,?)`
+	res, err := Db.Exec(query, user.Name, user.Email, user.Password, user.Address, user.BloodGroupId, user.Mobile)
 	if err != nil {
 		return 0, fmt.Errorf("failed to insert user: %w", err)
 	}
