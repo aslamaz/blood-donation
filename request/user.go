@@ -13,3 +13,8 @@ type RegisterUser struct {
 	BloodGroupId int    `json:"bloodGroupId"`
 	Password     string `json:"password"`
 }
+
+type ChangePassword struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+}

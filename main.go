@@ -32,6 +32,7 @@ func main() {
 	r.Post("/login", handler.HandleLogin)
 	r.Get("/user/me", handler.GetUser)
 	r.Post("/user", handler.RegisterUser)
+	r.Patch("/user/me/password", handler.ChangePassword)
 
 	err = http.ListenAndServe(":3000", r)
 	if err != nil {

@@ -95,3 +95,11 @@ func InsertUser(user model.User) (int, error) {
 
 	return int(id), nil
 }
+func UpdateUserPassword(id int, password string) error {
+	query := `UPDATE user SET password=?, updated_at=CURRENT_TIMESTAMP WHERE id=?`
+	_, err := Db.Exec(query, password, id)
+	if err != nil {
+		return fmt.Errorf("failed to update password of user: %w", err)
+	}
+	return nil
+}
