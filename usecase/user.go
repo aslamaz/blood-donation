@@ -10,6 +10,7 @@ import (
 	"github.com/aslamaz/blood-donation/request"
 	"github.com/aslamaz/blood-donation/response"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func GenerateToken(req *request.LoginRequest) (*response.LoginResponse, error) {
@@ -17,7 +18,10 @@ func GenerateToken(req *request.LoginRequest) (*response.LoginResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get user by email: %w", err)
 	}
-	if u == nil || u.Password != req.Password {
+	if u == nil {
+		return nil, constant.ErrInvalidCredentials
+	}
+	if err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(req.Password)); err != nil {
 		return nil, constant.ErrInvalidCredentials
 	}
 
@@ -65,13 +69,17 @@ func RegisterUser(req *request.RegisterUser) (*response.RegisterUser, error) {
 	if bloodGroup == nil {
 		return nil, constant.ErrInvalidBloodGroup
 	}
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate hashed password:%w", err)
+	}
 
 	var user model.User
 	user.Name = req.Name
 	user.Email = req.Email
 	user.BloodGroupId = req.BloodGroupId
 	user.Address = req.Address
-	user.Password = req.Password
+	user.Password = string(passwordHash)
 	user.Mobile = req.Mobile
 
 	id, err := repository.InsertUser(user)
