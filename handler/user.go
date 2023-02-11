@@ -129,3 +129,17 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		Message: "updated password",
 	})
 }
+func GetMatchingBloodGroups(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(*model.User)
+	resp, err := usecase.GetMatchingBloodGroups(&request.GetMatchingBloodGroups{
+		UserBloodGroupId: user.BloodGroupId,
+	})
+	if err != nil {
+		shared.SendJson(w, http.StatusInternalServerError, &response.Response{
+			Error: "internal sever error",
+		})
+		return
+	}
+	shared.SendJson(w, http.StatusOK, &response.Response{
+		Data: resp})
+}

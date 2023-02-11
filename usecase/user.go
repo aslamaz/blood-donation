@@ -91,3 +91,17 @@ func RegisterUser(req *request.RegisterUser) (*response.RegisterUser, error) {
 		Id: id,
 	}, nil
 }
+func GetMatchingBloodGroups(req *request.GetMatchingBloodGroups) (*response.GetMatchingBloodGroups, error) {
+	donors, err := repository.GetDonorBloodGroups(req.UserBloodGroupId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get donor bloodgroups:%w", err)
+	}
+	recipients, err := repository.GetRecipientBloodGroups(req.UserBloodGroupId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get recipient bloodgroups:%w", err)
+	}
+	return &response.GetMatchingBloodGroups{
+		Recieves: donors,
+		Gives:    recipients,
+	}, nil
+}
