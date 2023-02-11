@@ -9,6 +9,7 @@ type RegisterUser struct {
 }
 
 type GetMatchingBloodGroups struct {
-	Recieves []string `json:"recieves"`
-	Gives    []string `json:"gives"`
+	Recieves   []string `json:"recieves"`
+	Gives      []string `json:"gives"`
+	BloodGroup string   `json:"bloodGroup"`
 }

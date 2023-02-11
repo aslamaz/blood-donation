@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/aslamaz/blood-donation/constant"
 	"github.com/aslamaz/blood-donation/model"
@@ -11,6 +12,7 @@ import (
 	"github.com/aslamaz/blood-donation/response"
 	"github.com/aslamaz/blood-donation/shared"
 	"github.com/aslamaz/blood-donation/usecase"
+	"github.com/go-chi/chi/v5"
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -121,15 +123,43 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		Message: "updated password",
 	})
 }
-func GetMatchingBloodGroups(w http.ResponseWriter, r *http.Request) {
+func GetMatchingBloodGroupsOfUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(*model.User)
 	resp, err := usecase.GetMatchingBloodGroups(&request.GetMatchingBloodGroups{
-		UserBloodGroupId: user.BloodGroupId,
+		BloodGroupId: user.BloodGroupId,
 	})
 	if err != nil {
 		shared.SendJson(w, http.StatusInternalServerError, &response.Response{
 			Error: "internal sever error",
 		})
+		return
+	}
+	shared.SendJson(w, http.StatusOK, &response.Response{
+		Data: resp})
+}
+func GetMatchingBloodGroups(w http.ResponseWriter, r *http.Request) {
+	bgId := chi.URLParam(r, "bgid")
+	bloodGroupId, err := strconv.ParseInt(bgId, 10, 64)
+	if err != nil {
+		shared.SendJson(w, http.StatusNotFound, &response.Response{
+			Error: "not found",
+		})
+		return
+	}
+	resp, err := usecase.GetMatchingBloodGroups(&request.GetMatchingBloodGroups{
+		BloodGroupId: int(bloodGroupId),
+	})
+	if err != nil {
+		switch err {
+		case constant.ErrInvalidBloodGroup:
+			shared.SendJson(w, http.StatusNotFound, &response.Response{
+				Error: "not found",
+			})
+		default:
+			shared.SendJson(w, http.StatusInternalServerError, &response.Response{
+				Error: "internal sever error",
+			})
+		}
 		return
 	}
 	shared.SendJson(w, http.StatusOK, &response.Response{

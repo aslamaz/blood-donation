@@ -92,17 +92,25 @@ func RegisterUser(req *request.RegisterUser) (*response.RegisterUser, error) {
 	}, nil
 }
 func GetMatchingBloodGroups(req *request.GetMatchingBloodGroups) (*response.GetMatchingBloodGroups, error) {
-	donors, err := repository.GetDonorBloodGroups(req.UserBloodGroupId)
+	bloodGroup, err := repository.GetBloodGroupById(req.BloodGroupId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bloodgroup by id:%w", err)
+	}
+	if bloodGroup == nil {
+		return nil, constant.ErrInvalidBloodGroup
+	}
+	donors, err := repository.GetDonorBloodGroups(req.BloodGroupId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get donor bloodgroups:%w", err)
 	}
-	recipients, err := repository.GetRecipientBloodGroups(req.UserBloodGroupId)
+	recipients, err := repository.GetRecipientBloodGroups(req.BloodGroupId)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get recipient bloodgroups:%w", err)
 	}
 	return &response.GetMatchingBloodGroups{
-		Recieves: donors,
-		Gives:    recipients,
+		Recieves:   donors,
+		Gives:      recipients,
+		BloodGroup: bloodGroup.Name,
 	}, nil
 }
 

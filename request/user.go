@@ -23,5 +23,5 @@ type ChangePassword struct {
 }
 
 type GetMatchingBloodGroups struct {
-	UserBloodGroupId int
+	BloodGroupId int
 }
