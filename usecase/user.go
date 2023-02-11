@@ -105,3 +105,17 @@ func GetMatchingBloodGroups(req *request.GetMatchingBloodGroups) (*response.GetM
 		Gives:    recipients,
 	}, nil
 }
+
+func ChangePassword(req *request.ChangePassword) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(req.User.Password), []byte(req.OldPassword)); err != nil {
+		return constant.ErrInvalidCredentials
+	}
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), 10)
+	if err != nil {
+		return fmt.Errorf("failed to generate from password:%w", err)
+	}
+	if err = repository.UpdateUserPassword(req.User.Id, string(passwordHash)); err != nil {
+		return fmt.Errorf("failed to update user password:%w", err)
+	}
+	return nil
+}

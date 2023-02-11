@@ -7,12 +7,10 @@ import (
 
 	"github.com/aslamaz/blood-donation/constant"
 	"github.com/aslamaz/blood-donation/model"
-	"github.com/aslamaz/blood-donation/repository"
 	"github.com/aslamaz/blood-donation/request"
 	"github.com/aslamaz/blood-donation/response"
 	"github.com/aslamaz/blood-donation/shared"
 	"github.com/aslamaz/blood-donation/usecase"
-	"golang.org/x/crypto/bcrypt"
 )
 
 func HandleLogin(w http.ResponseWriter, r *http.Request) {
@@ -102,29 +100,23 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := r.Context().Value("user").(*model.User)
-
-	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.OldPassword)); err != nil {
-		shared.SendJson(w, http.StatusForbidden, &response.Response{
-			Error: "invalid credentials",
-		})
-		return
-	}
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), 10)
+	req.User = r.Context().Value("user").(*model.User)
+	err = usecase.ChangePassword(&req)
 	if err != nil {
-		fmt.Println(err)
-		shared.SendJson(w, http.StatusInternalServerError, &response.Response{
-			Error: "internal server errorr",
-		})
+		switch err {
+		case constant.ErrInvalidCredentials:
+			shared.SendJson(w, http.StatusUnauthorized, &response.Response{
+				Error: "invalid credentials",
+			})
+		default:
+			fmt.Println(err)
+			shared.SendJson(w, http.StatusInternalServerError, &response.Response{
+				Error: "internal server error",
+			})
+		}
 		return
 	}
-	if err = repository.UpdateUserPassword(user.Id, string(passwordHash)); err != nil {
-		fmt.Println(err)
-		shared.SendJson(w, http.StatusInternalServerError, &response.Response{
-			Error: "internal server errorr",
-		})
-		return
-	}
+
 	shared.SendJson(w, http.StatusOK, &response.Response{
 		Message: "updated password",
 	})

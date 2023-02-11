@@ -1,5 +1,7 @@
 package request
 
+import "github.com/aslamaz/blood-donation/model"
+
 type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -17,6 +19,7 @@ type RegisterUser struct {
 type ChangePassword struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
+	User        *model.User
 }
 
 type GetMatchingBloodGroups struct {
