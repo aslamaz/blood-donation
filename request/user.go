@@ -25,3 +25,6 @@ type ChangePassword struct {
 type GetMatchingBloodGroups struct {
 	BloodGroupId int
 }
+// type GetBloodGroups struct {
+// 	BloodGroups string `json:"bloodgroups"`
+// }

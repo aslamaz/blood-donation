@@ -13,3 +13,6 @@ type GetMatchingBloodGroups struct {
 	Gives      []string `json:"gives"`
 	BloodGroup string   `json:"bloodGroup"`
 }
+type GetBloodGroups struct {
+	BloodGroups []string `json:"bloodGroup"`
+}

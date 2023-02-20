@@ -36,6 +36,7 @@ func main() {
 	r.With(middleware.Authorize).Patch("/user/me/password", handler.ChangePassword)
 	r.With(middleware.Authorize).Get("/user/matching-blood-group", handler.GetMatchingBloodGroupsOfUser)
 	r.Get("/blood-group/{bgid}/matching-blood-group", handler.GetMatchingBloodGroups)
+	r.Get("/blood-group", handler.GetBloodGroups)
 	err = http.ListenAndServe(":3000", r)
 	if err != nil {
 		panic(err)

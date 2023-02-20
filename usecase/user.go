@@ -127,3 +127,10 @@ func ChangePassword(req *request.ChangePassword) error {
 	}
 	return nil
 }
+func GetBloodGroups() ([]model.BloodGroup, error) {
+	bloodGroups, err := repository.GetAllBloodGroups()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bloodgroup:%w", err)
+	}
+	return bloodGroups, nil
+}

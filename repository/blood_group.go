@@ -70,3 +70,23 @@ func GetRecipientBloodGroups(donorBloodGroupId int) ([]string, error) {
 	}
 	return recipientBloodGroups, nil
 }
+func GetAllBloodGroups() ([]model.BloodGroup, error) {
+	query := `SELECT id,name FROM blood_group`
+	rows, err := Db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get bloodgroups:%w", err)
+	}
+	defer rows.Close()
+	var bloodGroups []model.BloodGroup
+	var bg model.BloodGroup
+	for rows.Next() {
+		if err := rows.Scan(&bg.Id, &bg.Name); err != nil {
+			return nil, fmt.Errorf("failed scan bloodgroups:%w", err)
+		}
+		bloodGroups = append(bloodGroups, bg)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("failed to iterate bloodgroups:%w", err)
+	}
+	return bloodGroups, nil
+}
