@@ -168,9 +168,11 @@ func GetMatchingBloodGroups(w http.ResponseWriter, r *http.Request) {
 func GetBloodGroups(w http.ResponseWriter, r *http.Request) {
 	resp, err := usecase.GetBloodGroups()
 	if err != nil {
+		fmt.Println(err)
 		shared.SendJson(w, http.StatusInternalServerError, &response.Response{
 			Error: "internal sever error",
 		})
+		return
 
 	}
 	shared.SendJson(w, http.StatusOK, &response.Response{
